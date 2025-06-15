@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://corewynwood.com/wp-content/themes/corewynwood_template/jsWW1.js" defer=""></script>
+    <!-- DateTime -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <script>
+        let globalColors = [];
+        let globalPaintType = '';
+        $(document).ready(function () {
+            // Tạo bảng lịch khi click vào ô nhập ngày
+            $("#date").datepicker({
+                dateFormat: "dd-mm-yy"
+            });
+
+            // Tạo bảng chọn giờ khi click vào ô nhập giờ
+            $("#time").timepicker({
+                timeFormat: "HH:mm",
+                interval: 30,
+                minTime: "00:00",
+                maxTime: "23:30",
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
+        });
+    </script>
+    <!-- /* Style the form */ -->
+    <style>
+        #regForm {
+            background-color: white;
+            margin: 0px;
+            padding: 0;
+            width: 70%;
+            min-width: 300px;
+        }
+
+        /* Style the input fields */
+        input {
+            padding: 10px;
+            width: 100%;
+            font-size: 17px;
+            font-family: Raleway;
+            border: 1px solid #aaaaaa;
+        }
+
+        /* Mark input boxes that gets an error on validation: */
+        input.invalid {
+            background-color: #ffdddd;
+        }
+
+        /* Hide all steps by default: */
+        .tab {
+            display: none;
+        }
+
+        /* Make circles that indicate the steps of the form: */
+        .step {
+            height: 35px;
+            width: 15px;
+            /* margin: 0 2px; */
+            background-color: gray;
+            border: none;
+            border-radius: 50%;
+            /* display: inline-block; */
+            margin-right: 100px;
+            opacity: 0.5;
+            align-items: center;
+            color: white;
+        }
+
+        /* Mark the active step: */
+        .step.active {
+            opacity: 1;
+            background-color: orange;
+        }
+
+        /* Mark the steps that are finished and valid: */
+        .step.finish {
+            background-color: rgb(0, 0, 0);
+        }
+    </style>
+    <!-- wall area -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            /* padding: 20px; */
+            width: 100%;
+        }
+
+        .tab {
+            background-color: transparent;
+            border-radius: 10px;
+            padding: 20px;
+            /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        .room {
+            width: 100px;
+            background-color: gray;
+            border: none;
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .room:hover {
+            background-color: orange;
+        }
+
+        .room.selected {
+            background-color: black;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .room-list {
+            margin-top: 20px;
+        }
+
+        .participant-input {
+            width: 60px;
+            text-align: center;
+            margin-left: 10px;
+        }
+
+        .room-section {
+            margin-bottom: 20px;
+            /* Khoảng cách giữa các phần */
+        }
+
+        h3 {
+            text-align: center;
+            /* Căn giữa tiêu đề */
+        }
+    </style>
+    <!-- Paint type -->
+    <style>
+        .water-container {
+            display: none;
+        }
+
+        .color {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+
+        .spray {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+
+        .water {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+    </style>
+    <!-- POINTER -->
+    <style>
+        * {
+            -ms-scroll-chaining: none;
+            -ms-content-zooming: none;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+
+        }
+
+        .canvas-outer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1
+        }
+
+        .canvas-outer.beneath {
+            z-index: -1
+        }
+
+        .canvas-outer canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        splash-bg {
+            display: block
+        }
+
+        splash-bg,
+        splash-bg canvas {
+            height: 100%;
+            position: absolute;
+            bottom: auto;
+            left: 0;
+            right: auto;
+            top: 0;
+            width: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="preloader-content">
+            <img src="/Image/Logo.jpg" alt="Logo" class="preloader-logo">
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.classList.add('slide-out');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 500);
+        });
+    </script>
+    <header>
+        <div class="logo">
+            <a href="/Home.html">
+                <img src="/Image/Logo.jpg" alt="Logo">
+            </a>
+        </div>
+        <nav class="menu-content">
+            <a href="/Home.html">HOME <span class="icon"><i class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Booking.html">BOOKING <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Galleries.html">GALLERIES <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Aboutus.html">ABOUT US <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+        </nav>
+  
+    </header>
+    <div class="slideshow-container" style="margin-bottom: 20px;">
+        <div class="slide">
+            <img src="/Image/slide1.jpg" alt="Artwork 1">
+            <div class="text-content">
+                <p>"Painting allows me to see the world from a different perspective, from within my soul." 
+                </p>
+                <p class="artist">- Claude Monet.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide2.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>“Art is not the application of a canon of beauty but what the instinct and the brain can conceive beyond any canon.” 
+                </p>
+                <p class="artist">- Pablo Picasso.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide3.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"“Art is a way for us to say things that cannot be expressed in words.” 
+                </p>
+                <p class="artist">- Vincent VanGogh.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide4.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>“Working on the wall motivated us to push ourselves and get out of our comfort zone. It gave us more confidence in our work and how we define ourselves as artists.” 
+                </p>
+                <p class="artist">- Artist Ashop Crew.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide5.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"“Art is not just about making beautiful pictures, but about making meaningful pictures.”
+                </p>
+                <p class="artist">- Pablo Picasso.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide6.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"In a gallery, you reach people looking for art. When you paint on the street, you're in front of people. The walls are where you meet other artists."
+                </p>
+                <p class="artist">- Artist Martin Whatson.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/Image/slide7.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"An art paradise where anything is possible - like my second home." 
+                </p>
+                <p class="artist">- Artist Mikael B.</p>
+            </div>
+        </div>
+        <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+        <a class="next" onclick="changeSlide(1)">&#10095;</a>
+
+    </div>
+
+
+
+    <div class="custom-scroll contacts-page v-scroll" id="custom-scroll"></div>
+    <div class="canvas-outer beneath" data-splash-bg-outer=""> <splash-bg class="splash-bg" style="opacity: 1;"><canvas
+                width="1381" height="858"></canvas></splash-bg></div>
+    <div class="canvas-outer" id="three-js"><canvas width="1381" height="858"
+            style="width: 1381px; height: 858px;"></canvas></div>
+    
+
+    <section id="content"
+        style="display: flex; justify-content: center; height: 1100px; width: auto; justify-content: space-between; gap: 20px;  margin-left: 100px; margin-right: 100px;">
+        <div style="display: block; width: 400px; ">
+            <div style="height:640px; width: 400px;">
+                <div style="height:500px; width: 400px;">
+                    <img id="image_1" src="/Gallary/6c350891e20bead11826ea99fb9d10e3.jpg" alt="Girl in a jacket"
+                        style="height:500px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_1" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_1" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px; ">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+            <div style=" width: 300px; ">
+                <div style="margin-bottom: 0; height:300px">
+                    <img id="image_2" src="/Gallary/9e3089fe903fc9b56ea767be4e40e4b2.jpg" alt="Girl in a jacket"
+                        style="height:300px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_2" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_2" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px;">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+        </div>
+        <div style="display: block; width: 400px;">
+            <div style=" width: 300px; ">
+                <div style="margin-bottom: 0; height:300px">
+                    <img id="image_3" src="/Gallary/51f67ae1095fd702e512985b9388b642.jpg" alt="Girl in a jacket"
+                        style="height:300px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_3" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_3" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px;">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+            <div style="height:640px; width: 400px;">
+                <div style="height:500px; width: 400px;">
+                    <img id="image_4" src="/Gallary/14d9593a6836e2a75a59ae0f00cfbcec.jpg" alt="Girl in a jacket"
+                        style="height:500px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_4" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_4" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px; ">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+
+        </div>
+        <div style="display: block; width: 400px;">
+            <div style="height:640px; width: 400px;">
+                <div style="height:500px; width: 400px;">
+                    <img id="image_5" src="/Gallary/2054c6d30e854de69e84e91d069052be.jpg" alt="Girl in a jacket"
+                        style="height:500px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_5" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_5" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px; ">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+            <div style=" width: 300px; ">
+                <div style="margin-bottom: 0; height:300px">
+                    <img id="image_6" src="/Gallary/29351931_10213852764806790_7197054541824738462_o.jpg"
+                        alt="Girl in a jacket"
+                        style="height:300px; width: 400px; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                        onclick="openModal(this.src);">
+                </div>
+                <div
+                    style="background-color: rgb(238, 234, 234); margin-top: 0; width: 400px; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                    <div id="title_6" class="elementor-heading-title elementor-size-default"
+                        style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                    <p id="text_6" style="font-size: 15px;line-height: 1.3; margin-top: 5px; width: 400px;">The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <section id="content">
+        <div style="width: auto;">
+            <div style="height:500px; width: auto;">
+                <img id="image_7" src="/Gallary/ad9211ad24b0d1989f47c0288ee0cd42.jpg" alt="Girl in a jacket"
+                    style="height:500px; width: 80%; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px; margin-left: 10%; margin-right: 10%;"
+                    onclick="openModal(this.src);">
+            </div>
+            <div
+                style="background-color: rgb(238, 234, 234); margin-top: 0; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent; margin-left: 10%; margin-right: 10%;">
+                <div id="title_7" class="elementor-heading-title elementor-size-default"
+                    style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                <p id="text_7"
+                    style="font-size: 15px;line-height: 1.3; margin-top: 5px; margin-left: 200px; margin-right: 200px; ">
+                    The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+            </div>
+        </div>
+    </section>
+    <section id="content"
+        style="display: flex; justify-content: center; height: 650px; width: 90%; justify-content: space-between; gap: 20px;  margin-left: 5%; margin-right: 5%;">
+        <div style="width: 50%;">
+            <div style="height:500px; width: 100%;">
+                <img id="image_8" src="/Gallary/05095a152b1deec56347a8672b6a5f10.jpg" alt="Girl in a jacket"
+                    style="height:500px; width: 100%; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                    onclick="openModal(this.src);">
+            </div>
+            <div
+                style="background-color: rgb(238, 234, 234); margin-top: 0; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent;">
+                <div id="title_8" class="elementor-heading-title elementor-size-default"
+                    style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                <p id="text_8"
+                    style="font-size: 15px;line-height: 1.3; margin-top: 5px; margin-left: 10%; margin-right: 10%;; width: auto;">
+                    The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+            </div>
+        </div>
+        <div style="width: 50%">
+            <div style="height:500px; width: 100%;">
+                <img id="image_9" src="/Gallary/428705864_18402461275064455_3408960117460138777_n.jpg"
+                    alt="Girl in a jacket"
+                    style="height:500px; width: 100%; margin-bottom: 0; border-top-left-radius: 10px; border-top-right-radius: 10px;"
+                    onclick="openModal(this.src);">
+            </div>
+            <div
+                style="background-color: rgb(238, 234, 234); margin-top: 0; text-align: center; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; background-color: transparent; width: 100%">
+                <div id="title_9" class="elementor-heading-title elementor-size-default"
+                    style="font-size: 20PX;font-weight: bolder;margin-top: 5px">"My sun has finally expired"</div>
+                <p id="text_9"
+                    style="font-size: 15px;line-height: 1.3; margin-top: 5px; margin-left: 10%; margin-right: 10%;; width: auto; ">
+                    The painting recreates an emotional moment when the brilliant red sun sets in the heart of the city. High-rise buildings are depicted with rigid lines, with the red color of the sky creating a contrast between modern life and quiet natural beauty.</p>
+            </div>
+        </div>
+    </section>
+    <div id="imageModal">
+        <style>
+            /* CSS cho modal */
+            #imageModal {
+                display: none;
+                /* Ẩn modal ban đầu */
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.8);
+                justify-content: center;
+                align-items: center;
+            }
+
+            #modalImage {
+                max-width: 90%;
+                max-height: 90%;
+            }
+
+            #closeModal {
+                color: white;
+                position: absolute;
+                top: 20px;
+                right: 30px;
+                font-size: 40px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        </style>
+        <span id="closeModal">&times;</span>
+        <img id="modalImage" />
+    </div>
+
+    <div class="pagination">
+        <style>
+            .pagination {
+                display: flex;
+                justify-content: center;
+                margin: 20px 0;
+            }
+
+            .pagination button {
+                border: none;
+                outline: none;
+                padding: 10px 20px;
+                margin: 0 5px;
+                background-color: gray;
+                color: black;
+                cursor: pointer;
+                border-radius: 50%;
+            }
+
+            .pagination button.active {
+                background-color: black;
+                color: white;
+            }
+
+            .pagination button:hover:not(.active) {
+                background-color: #ddd;
+            }
+        </style>
+        <button onclick="changePage(1)" class="active">1</button>
+        <button onclick="changePage(2)">2</button>
+        <button onclick="changePage(3)">3</button>
+        <button onclick="changePage(4)">4</button>
+    </div>
+
+
+
+
+
+
+    <hr class="custom-hr-black">
+    <footer>
+        <div class="logo-footer">
+            <a href="/Home.html">
+                <img src="/Image/Logo.png" alt="Logo">
+            </a>
+            <p class="p1">Subscribe to our newsletter to receive exclusive content and offers right to your inbox.</p>
+            <div class="subscribe">
+                <input type="email" placeholder="Your Email" required="required">
+                <button>
+                    Subscribe
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <ul id="menu-1-71a8b61a" class="elementor-nav-menu sm-vertical">
+                <li>Contact us</li>
+                <li>Press</li>
+                <li>FAQs</li>
+                <li>Jobs</li>
+                <li>Shop</li>
+                <li>Terms and Conditions</li>
+            </ul>
+
+        </div>
+        <div>
+            <ul class="social-link">
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.facebook.com/dom.dreamsofmural"
+                        class="elementor-item">
+                        <i class="fab fa-facebook-f" style="padding-right: 5px;"></i> Facebook
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.instagram.com/domdreamsofmural/"
+                        class="elementor-item">
+                        <i class="fab fa-instagram" style="padding-right: 5px;"></i> Instagram
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.tiktok.com/@dreamofmural"
+                        class="elementor-item">
+                        <i class="fab fa-tiktok" style="padding-right: 5px;"></i> Tiktok
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+    </footer>
+    <div class="table-footer">
+        <div class="left">
+            <div class="working">
+                <h1>WORKING HOURS</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="open-daily">
+                <div class="left-daily">
+                    <h2>OPEN DAILY</h2>
+                    <h1>10AM</h1>
+                </div>
+                <div class="right-daily">
+                    <h2>CLOSE TIME</h2>
+                    <hr class="custom-hr">
+                    <h1>7PM</h1>
+                    <p>Sun. Mon. Tue. Wed. Thu.</p>
+                    <h1>8PM</h1>
+                    <p>Fri. Sat.</p>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="weather">
+                <h1>WEATHER</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="weather-table">
+                <iframe
+                    src="https://thoitiet.app/widget/embed/da-nang?style=1&day=7&td=%23003870&ntd=%23ff0000&mvb=%23959dad&mv=%23ff0000&mdk=%23dddddd&htd=true"
+                    id="widgeturl" width="100%" height="600px" scrolling="no" frameborder="0" allowtransparency="true"
+                    style="border:none;overflow:hidden; height: 500px;"></iframe><!-- End thoitiet.app widget -->
+                <!-- https://thoitiet.app/widget -->
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="custom-scroll contacts-page v-scroll" id="custom-scroll"> </div>
+    <div class="canvas-outer beneath" data-splash-bg-outer=""> <splash-bg class="splash-bg" style="opacity: 1;"><canvas
+                width="1381" height="858"></canvas></splash-bg> </div>
+    <div class="canvas-outer" id="three-js"><canvas width="1381" height="858"
+            style="width: 1381px; height: 858px;"></canvas></div>
+</body>
+<script src="script.js"></script>
+
+</html>

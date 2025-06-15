@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://corewynwood.com/wp-content/themes/corewynwood_template/jsWW1.js" defer=""></script>
+    <!-- DateTime -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <script>
+        let globalColors = [];
+        let globalPaintType = '';
+        $(document).ready(function () {
+            // Tạo bảng lịch khi click vào ô nhập ngày
+            $("#date").datepicker({
+                dateFormat: "dd-mm-yy",
+                minDate: 0,
+            });
+
+            // Tạo bảng chọn giờ khi click vào ô nhập giờ
+            $("#time").timepicker({
+                timeFormat: "HH:mm",
+                interval: 30,
+                minTime: "09:00",
+                maxTime: "23:00",
+                dynamic: false,
+                dropdown: true,
+                scrollbar: true
+            });
+        });
+    </script>
+    <!-- /* Style the form */ -->
+    <style>
+        #regForm {
+            background-color: white;
+            margin: 0px auto;
+            padding: 0;
+            width: 70%;
+            min-width: 300px;
+        }
+
+        /* Style the input fields */
+        input {
+            padding: 10px;
+            width: 100%;
+            font-size: 17px;
+            font-family: Raleway;
+            border: 1px solid #aaaaaa;
+        }
+
+        /* Mark input boxes that gets an error on validation: */
+        input.invalid {
+            background-color: #ffdddd;
+        }
+
+        /* Hide all steps by default: */
+        .tab {
+            display: none;
+        }
+
+        /* Make circles that indicate the steps of the form: */
+        /* .step {
+            height: 35px;
+            width: 15px;
+            background-color: gray;
+            border: none;
+            border-radius: 50%;
+            margin-right: 100px;
+            opacity: 0.5;
+            align-items: center;
+            color: white;
+        } */
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            flex: 0 1 200px; /* flex-grow | flex-shrink | flex-basis */
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+
+        .step.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Mark the active step: */
+        .step.active {
+            opacity: 1;
+            background-color: gray;
+        }
+
+        /* Mark the steps that are finished and valid: */
+        .step.finish {
+            color: white;
+            background-color: black;
+        }
+    </style>
+    <!-- wall area -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            /* padding: 20px; */
+            width: 100%;
+        }
+
+        .tab {
+            background-color: transparent;
+            border-radius: 10px;
+            padding: 20px;
+            /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+        }
+
+        .room {
+            width: 100px;
+            background-color: gray;
+            border: none;
+            color: white;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .room:hover {
+            background-color: orange;
+        }
+
+        .room.selected {
+            background-color: black;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .room-list {
+            margin-top: 20px;
+        }
+
+        .participant-input {
+            width: 60px;
+            text-align: center;
+            margin-left: 10px;
+        }
+
+        .room-section {
+            margin-bottom: 20px;
+            /* Khoảng cách giữa các phần */
+        }
+
+        h3 {
+            text-align: center;
+            /* Căn giữa tiêu đề */
+        }
+    </style>
+    <!-- Paint type -->
+    <style>
+        .water-container {
+            display: none;
+        }
+
+        .color {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+
+        .spray {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+
+        .water {
+            margin: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: inline-block;
+            width: 80px;
+            text-align: center;
+        }
+    </style>
+    <!-- POINTER -->
+    <style>
+        * {
+            -ms-scroll-chaining: none;
+            -ms-content-zooming: none;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+
+        }
+
+        .canvas-outer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1
+        }
+
+        .canvas-outer.beneath {
+            z-index: -1
+        }
+
+        .canvas-outer canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%
+        }
+
+        splash-bg {
+            display: block
+        }
+
+        splash-bg,
+        splash-bg canvas {
+            height: 100%;
+            position: absolute;
+            bottom: auto;
+            left: 0;
+            right: auto;
+            top: 0;
+            width: 100%
+        }
+    </style>
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="preloader-content">
+            <img src="/Image/Logo.jpg" alt="Logo" class="preloader-logo">
+        </div>
+    </div>
+    
+    <script>
+        window.addEventListener('load', function() {
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.classList.add('slide-out');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 500);
+        });
+    </script>
+    <header>
+        <div class="logo">
+            <a href="/Home.html">
+                <img src="/Image/Logo.jpg" alt="Logo">
+            </a>
+        </div>
+        <nav class="menu-content">
+            <a href="/Home.html">HOME <span class="icon"><i class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Booking.html">BOOKING <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Galleries.html">GALLERIES <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Aboutus.html">ABOUT US <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+        </nav>
+
+    </header>
+    <div class="slideshow-container" style="margin-bottom: 20px;">
+        <div class="slide">
+            <img src="/slide/61b0ba0ebfc5e-WhatsApp-Image-20211109-at-17-33-31-1-1 (1).jpeg" alt="Artwork 1">
+            <div class="text-content">
+                <p>"Painting allows me to see the world from a different perspective, from within my soul." 
+                </p>
+                <p class="artist">- Claude Monet.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/125fb0akdkaf-whatsapp-image-62143.png" alt="Artwork 2">
+            <div class="text-content">
+                <p>“Art is not the application of a canon of beauty but what the instinct and the brain can conceive beyond any canon.” 
+                </p>
+                <p class="artist">- Pablo Picasso.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/Ảnh chụp màn hình 2024-11-07 200030.png" alt="Artwork 2">
+            <div class="text-content">
+                <p>"“Art is a way for us to say things that cannot be expressed in words.” 
+                </p>
+                <p class="artist">- Vincent VanGogh.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/Ảnh chụp màn hình 2024-11-07 201116.png" alt="Artwork 2">
+            <div class="text-content">
+                <p>“Working on the wall motivated us to push ourselves and get out of our comfort zone. It gave us more confidence in our work and how we define ourselves as artists.” 
+                </p>
+                <p class="artist">- Artist Ashop Crew.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/FSN_BSF-Mural-2.jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"“Art is not just about making beautiful pictures, but about making meaningful pictures.”
+                </p>
+                <p class="artist">- Pablo Picasso.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/Greg-Mike-ATL (1).jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"In a gallery, you reach people looking for art. When you paint on the street, you're in front of people. The walls are where you meet other artists."
+                </p>
+                <p class="artist">- Artist Martin Whatson.</p>
+            </div>
+        </div>
+        <div class="slide">
+            <img src="/slide/ScottHessPhoto.com-Ricky-Watts-Phoenix-Mural (1).jpg" alt="Artwork 2">
+            <div class="text-content">
+                <p>"An art paradise where anything is possible - like my second home." 
+                </p>
+                <p class="artist">- Artist Mikael B.</p>
+            </div>
+        </div>
+        <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+        <a class="next" onclick="changeSlide(1)">&#10095;</a>
+
+    </div>
+
+
+
+    <div class="custom-scroll contacts-page v-scroll" id="custom-scroll"></div>
+    <div class="canvas-outer beneath" data-splash-bg-outer=""> <splash-bg class="splash-bg" style="opacity: 1;"><canvas
+                width="1381" height="858"></canvas></splash-bg></div>
+    <div class="canvas-outer" id="three-js"><canvas width="1381" height="858"
+            style="width: 1381px; height: 858px;"></canvas></div>
+    <form id="regForm" action="" style="width: 90%; padding: 20px; position: relative; background-color: transparent;">
+        <!-- 5 steps -->
+        <div class="steps">
+            <span class="step" >
+                <p>DATE TIME</p>
+
+            </span>
+            <span class="step" >
+                <p>WALL AREA</p>
+
+            </span>
+            <span class="step" >
+                <p>PAINT TYPE</p>
+
+            </span>
+            <span class="step" >
+                <p>SKETCH</p>
+
+            </span>
+            <span class="step" >
+                <p>YOUR TICKET</p>
+
+            </span>
+        </div>
+        <!-- DATE TIME -->
+        <div class="tab">
+            <div style="text-align: center; font-weight: bolder; font-size: 40px; margin-top: 0;">DATE TIME</div>
+            <div style="margin-top: 0; width: 100%; justify-content: center; display: flex; height: 300px;">
+                <div style="width: 50%; text-align: center; line-height: 2; margin-top: 40px;">
+                    <label for="date" style="font-weight: bold; font-size: 25px;">Choose Date:</label>
+                    <input type="text" id="date" placeholder="Chọn ngày" style="text-align: center;">
+                    <label for="time" style="font-weight: bold; font-size: 25px;">Choose Time:</label>
+                    <input type="text" id="time" placeholder="Chọn giờ" style="text-align: center;">
+                </div>
+            </div>
+        </div>
+<!--WALL AREA  -->
+        <div class="tab">
+            <div style="display: flex; width: 80%; margin-left: 10%; margin-right: 10%; ">
+                <div style="font-weight: bolder; font-size: 40px; width: 400px; margin-top: 13px;">WALL AREA</div>
+            </div>
+
+            <div class="room-section" style="text-align: center;">
+                <h3>SINGLE ROOM</h3>
+                <div class="rooms-container" id="single-rooms-container"></div>
+                <div class="info"
+                    style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
+
+                    <div id="selected-single-rooms">Selected Rooms:</div>
+                    <div id="single-room-list" class="room-list"></div>
+                </div>
+            </div>
+
+            <div class="room-section" style="text-align: center;">
+                <h3>GROUP ROOM</h3>
+                <div class="rooms-container" id="couple-rooms-container"></div>
+                <div class="info"
+                    style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
+                    <div id="selected-couple-rooms">Selected Rooms:</div>
+                    <div id="couple-room-list" class="room-list"></div>
+                </div>
+            </div>
+
+            <div class="room-section" style="text-align: center;">
+                <h3>WALL</h3>
+                <div class="rooms-container" id="walls-container"></div>
+                <div class="info"
+                    style="display: flex; flex-direction: column; align-items: center;justify-content: center;">
+                    <div id="selected-walls">Selected Walls:</div>
+                    <div id="wall-list" class="room-list"></div>
+                </div>
+            </div>
+        </div>
+        <!-- PAINT TYPE -->
+        <div class="tab">
+            <div style="font-weight: bolder; font-size: 40px; width: 400px; margin-bottom: 20px;">PAINT TYPE</div>
+            <div
+                style="display: flex; width: 80%; margin-left: 10%; margin-right: 10%; text-align: center; justify-content: center; gap: 15%; margin-top: 0;">
+                <style>
+                    .paint-type {
+                        /* display: inline-block; */
+                        width: 350px;
+                        height: 100px;
+                        background-color: #ddd;
+                        text-align: center;
+                        line-height: 70px;
+                        font-size: 40px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+
+                    .selected {
+                        background-color: #00f;
+                        color: white;
+                    }
+                </style>
+                <div class="paint-type" id="waterColorBtn" onclick="resetColors('Water Color')">Water Color</div>
+                <div class="paint-type" id="sprayPaintBtn" onclick="resetColors('Spray Paint')">Spray Paint</div>
+
+            </div>
+
+            <div id="room-selection1" class="water-container" style="margin-top: 20px;">
+                <div id="water_color" style="justify-content: center; display: flex; text-align: center;">
+                    <div style=" text-align: center; font-size: 50px; font-weight: bolder; margin-bottom: 20px;">Water Color</div>
+
+                    <div class="water" id="none1"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="water" id="none2"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="water" id="none3"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="water" id="none4"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="water" id="none5"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="water" id="none6"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                </div>
+                <div id="spray_paint" style="justify-content: center; display: flex; text-align: center; ">
+                    <div style=" text-align: center; font-size: 50px; font-weight: bolder; margin-bottom: 20px;">Spray Paint</div>
+                    <div class="spray" id="none1"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="spray" id="none2"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="spray" id="none3"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="spray" id="none4"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="spray" id="none5"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+                    <div class="spray" id="none6"
+                        style="font-weight: bold; width: 150px; height: 30px; font-size: 20px; font-size: 30px; margin-right: 20px;">
+                        None
+                    </div>
+
+
+                </div>
+                <div id="colors" style="text-align: center; margin-top: 20px; justify-items: center; display: block;">
+                    <div style=" text-align: center; font-size: 50px; font-weight: bolder; margin-bottom: 20px;">Colors
+                    </div>
+                    <div class="color" onclick="handleColorClick('White', 'white')"
+                        style="font-size: 20px; width: 170px; ;background-color: white; font-weight: bold;">White</div>
+                    <div class="color" onclick="handleColorClick('Black', 'black')"
+                        style="font-size: 20px; width: 170px; ;background-color: black; font-weight: bold; color:white;">
+                        Black</div>
+                    <div class="color" onclick="handleColorClick('Yellow', 'yellow')"
+                        style="font-size: 20px; width: 170px; ;background-color: yellow; font-weight: bold;">Yellow
+                    </div>
+                    <div class="color" onclick="handleColorClick('Brown', 'brown')"
+                        style="font-size: 20px; width: 170px; ;background-color: Brown; font-weight: bold;">Brown</div>
+                    <div class="color" onclick="handleColorClick('Gray', 'gray')"
+                        style="font-size: 20px; width: 170px; ;background-color: Gray; font-weight: bold;">Gray</div>
+                    <div class="color" onclick="handleColorClick('Pastel', 'lightyellow')"
+                        style="font-size: 20px; width: 170px; ;background-color: yellow; font-weight: bold;">Pastel
+                    </div>
+                    <div class="color" onclick="handleColorClick('Pink', 'pink')"
+                        style="font-size: 20px; width: 170px; ;background-color: Pink; font-weight: bold;">Pink</div>
+                    <div class="color" onclick="handleColorClick('Blue', 'blue')"
+                        style="font-size: 20px; width: 170px; ;background-color: Blue; font-weight: bold;">Blue</div>
+                    <div class="color" onclick="handleColorClick('Red', 'red')"
+                        style="font-size: 20px; width: 170px; ;background-color: Red; font-weight: bold;">Red</div>
+                    <div class="color" onclick="handleColorClick('Purple', 'purple')"
+                        style="font-size: 20px; width: 170px; ;background-color: Purple; font-weight: bold;">Purple
+                    </div>
+                    <div class="color" onclick="handleColorClick('Orange', 'orange')"
+                        style="font-size: 20px; width: 170px; ;background-color: Orange; font-weight: bold;">Orange
+                    </div>
+                    <div class="color" onclick="handleColorClick('Green', 'green')"
+                        style="font-size: 20px; width: 170px; ;background-color: Green; font-weight: bold;">Green</div>
+                    <h3 style="text-align: center;">Order at the counter if you want additional colors</h3>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- SKETCH -->
+        <div class="tab">
+            <div style="font-weight: bolder; font-size: 40px; width: 400px; margin-top: 13px; margin-bottom: 50px;">
+                SKETCH</div>
+            <div style="display: flex; width: 90%; margin-left: 0px; text-align: center; justify-content: center; gap: 25%; margin-top: 70;"
+                id="image">
+                <div style="margin-top: 0; border: 2px solid black;">
+                    <div
+                        style="text-align: center; font-size: 30px; font-weight: bolder; margin-bottom: 30px;margin-top: 50px; font-weight: bold; height: 50px;">
+                        PUT YOUR
+                        SKETCH HERE</div>
+                    <div
+                        style="text-align: center; font-size: 30px; font-weight: bolder; margin-bottom: 30px;margin-top: 50px;">
+                        (NOT
+                        REQUIRED)</div>
+                    <input type="file" id="imageInput" accept="image/*"
+                        style="margin-left: 0px; border: 2px black solid; width: 400px; ">
+                </div>
+                <div class="number">
+                    <img id="number4" src="/Gallary/none.jpg" alt="4" style="max-width: 400px; height: 400px;">
+                </div>
+            </div>
+
+            <section id="content" style="margin-top: 100px; width: 100%;">
+                <div style="display: flex; margin-left: 0; gap: 5%; align-items: center; justify-items: center;"
+                    id="number">
+                    <div
+                        style="display: inline-block; text-align: center;justify-items: center; width: 70%; border: 2px solid black; height: 200px;">
+                        <div style="font-size: 50px; font-weight: bold; margin-top: 60px;">SAMPLES SKETCH</div>
+                        <div style="font-size: 30px; margin-top: 30px;">Just in case you're confused</div>
+                    </div>
+                    <div style="display: flex; width: 100%; gap: 7%;" id="content">
+                        <div class="number" onclick="replaceImage(this)">
+                            <img class="image_1" id="sketchImage" src="/Sketching/3ec5721f53664b968936d33e33068164.jpg"
+                                alt="3" style="max-width: 200px;">
+                        </div>
+                        <div class="number" onclick="replaceImage(this)">
+                            <img class="image_2" id="sketchImage" src="/Sketching/4a40bae8da73717e9825f9477a86739c.jpg"
+                                alt="3" style="max-width: 200px;">
+                        </div>
+                        <div class="number" onclick="replaceImage(this)">
+                            <img class="image_3" id="sketchImage" src="/Sketching/4ce30f1b28d93da7b0b228cc29979e43.jpg"
+                                alt="3" style="max-width: 200px;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hàng dưới -->
+                <div style="display: flex; justify-content: center; align-items: center; margin-top: 50px; gap: 4%; margin-left: 40px;"
+                    id="content">
+                    <div class="number" onclick="replaceImage(this)">
+                        <img class="image_4" src="/Sketching/4fb5f13cde02799cdf83e5601ae929ba.jpg" alt="Image 1"
+                            style="max-width: 200px;">
+                    </div>
+                    <div class="number" onclick="replaceImage(this)">
+                        <img class="image_5" src="/Sketching/5a41691e2edf1d7ccddef6a7817528b7.jpg" alt="Image 2"
+                            style="max-width: 200px;">
+                    </div>
+                    <div class="number" onclick="replaceImage(this)">
+                        <img class="image_6" src="/Sketching/5f294b4d1039ddb9bd6742a20fae6efe.jpg" alt="Image 3"
+                            style="max-width: 200px;">
+                    </div>
+                    <div class="number" onclick="replaceImage(this)">
+                        <img class="image_7" src="/Sketching/6f4eaddfb45810ecfbbefab432d77fd8.jpg" alt="Image 4"
+                            style="max-width: 200px;">
+                    </div>
+                    <div class="number" onclick="replaceImage(this)">
+                        <img class="image_8" src="/Sketching/7c3dcb38b4c82fc25961f2d73298da1d.jpg" alt="Image 5"
+                            style="max-width: 200px;">
+                    </div>
+                </div>
+            </section>
+
+            <div class="pagination" style="margin-top: 100px;">
+                <style>
+                    .pagination {
+                        display: flex;
+                        justify-content: center;
+                        margin: 20px 0;
+                    }
+
+                    .pagination button {
+                        background-color: #f0f0f0;
+                        color: #333;
+                        border: 1px solid #ccc;
+                        padding: 8px 16px;
+                        cursor: pointer;
+                        transition: background-color 0.3s;
+                    }
+
+                    .pagination button.active1 {
+                        background-color: #4CAF50;
+                        color: white;
+                        border-color: #4CAF50;
+                    }
+                </style>
+                <button type="button" onclick="changePage1(1)" style="width: 100px; height: 50px; border-radius: 50%;"
+                    class="active1">1</button>
+                <button type="button" onclick="changePage1(2)"
+                    style="width: 100px; height: 50px; border-radius: 50%;">2</button>
+                <button type="button" onclick="changePage1(3)"
+                    style="width: 100px; height: 50px; border-radius: 50%;">3</button>
+                <button type="button" onclick="changePage1(4)"
+                    style="width: 100px; height: 50px; border-radius: 50%;">4</button>
+
+            </div>
+        </div>
+        <!-- YOUR TICKET -->
+        <div class="tab">
+            <div style="justify-items: center; text-align: center; display: block; align-items: center;">
+                <!-- <strong>YOUR FINAL TICKET</strong> -->
+                <div style="font-weight: bolder; font-size: 40px; width: 800px; margin-top: 13px; margin-bottom: 50px;">
+                    YOUR FINAL TICKET</div>
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; width: 100%; gap: 100px;">
+                        <p
+                            style="white-space: pre-line; font-size: 25px; border: #000 2px solid; width: 480px; text-align: center; height: 320px; display: flex; align-items: center; justify-content: center;">
+                            Ticket includes:
+                            - Room/Wall
+                            - 2 hours of room/Wall
+                            - 6 colors of your choice
+                            - X apron
+                            - X paintbrush
+                            - X paint ladder
+                            - X shA
+                            Drinks, snacks purchased at the counter
+                            Buy more colors at the counter
+                        </p>
+                        <div id="imageDisplay" style="height: 300px; display: flex; align-items: center; width: auto;"></div>
+                    </div>
+                    
+            </div>
+
+            <div class="step1"
+                style="width: 100%; height: 350px; display: inline-flex; gap: 150px; justify-content: center; align-items: center;">
+                <style>
+                    #ticketDetails {
+                        border: 2px solid #333;
+                        padding: 20px;
+                        margin-top: 20px;
+                        background-color: transparent;
+                        font-family: Arial, sans-serif;
+                        color: #333;
+                        display: flex;
+                        flex-direction: column;
+                        width: auto;
+                        max-width: 100%;
+                        border-radius: 10px;
+                    }
+
+                    #ticketDetails strong {
+                        font-size: 1.5em;
+                        color: #000;
+                        margin-bottom: 10px;
+                    }
+
+                    .ticket-row {
+                        display: flex;
+                        justify-content: space-between;
+                        width: 100%;
+                        margin-bottom: 10px;
+                    }
+
+                    .ticket-row .label {
+                        font-weight: bold;
+                        color: #555;
+                        width: 200px;
+                        margin-left: 50px;
+                    }
+
+                    .ticket-row .value {
+                        color: #333;
+                        width: 600px;
+                        text-align: center;
+                    }
+                </style>
+
+                <div id="ticketDetails" >
+                    <!-- Dữ liệu sẽ hiển thị ở đây -->
+                </div>
+            </div>
+        </div>
+        <!-- NEXT AND PREVIUOUS BUTTON -->
+        <div id="btn" style="overflow:auto;">
+            <style>
+                button:hover {
+                    background-color: #f07147;
+                    color: #9b51e0;
+                }
+            </style>
+            <div style="float:right; width: 500px; height: 70px; text-align: center; margin-top: 20px;">
+                <button type="button" id="prevBtn" onclick="nextPrev(-1) "
+                    style="width: 150px; height: 50px; font-size: 20px;">Previous</button>
+                <button type="button" id="nextBtn" onclick="nextPrev(1)"
+                    style="width: 150px; height: 50px; margin-left: 20px; font-size: 20px;">Next</button>
+            </div>
+        </div>
+
+    </form>
+
+<!-- WALL AREA -->
+    <script>
+        const singleRooms = [
+            { name: 'ROOM 01', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 02', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 03', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 04', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 05', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 06', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 07', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 08', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 09', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 10', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 11', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 12', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 13', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 14', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 15', price: '600.000 VND', maxParticipants: 2 },
+            { name: 'ROOM 16', price: '600.000 VND', maxParticipants: 2 },
+        ];
+
+        const coupleRooms = [
+            { name: 'ROOM 01', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 02', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 03', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 04', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 05', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 06', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 07', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 08', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 09', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 10', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 11', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 12', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 13', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 14', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 15', price: '1.000.000.000 VND', maxParticipants: 5 },
+            { name: 'ROOM 16', price: '1.000.000.000 VND', maxParticipants: 5 },
+        ];
+
+        const walls = [
+            { name: 'WALL 01', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 02', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 03', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 04', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 05', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 06', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 07', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 08', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 09', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 10', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 11', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 12', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 13', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 14', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 15', price: '2.000.000.000 VND', maxParticipants: 10 },
+            { name: 'WALL 16', price: '2.000.000.000 VND', maxParticipants: 10 },
+        ];
+
+        const singleRoomsContainer = document.getElementById('single-rooms-container');
+        const selectedSingleRoomsDiv = document.getElementById('single-room-list');
+
+        const coupleRoomsContainer = document.getElementById('couple-rooms-container');
+        const selectedCoupleRoomsDiv = document.getElementById('couple-room-list');
+
+        const wallsContainer = document.getElementById('walls-container');
+        const selectedWallsDiv = document.getElementById('wall-list');
+
+        // Tạo các nút cho SINGLE ROOMS
+        singleRooms.forEach(room => {
+            const button = document.createElement('button');
+            button.className = 'room';
+            button.type = 'button';
+            button.onclick = () => selectSingleRoom(room, button);
+            button.innerText = room.name;
+
+            singleRoomsContainer.appendChild(button);
+        });
+
+        // Tạo các nút cho COUPLE ROOMS
+        coupleRooms.forEach(room => {
+            const button = document.createElement('button');
+            button.className = 'room';
+            button.type = 'button';
+            button.onclick = () => selectCoupleRoom(room, button);
+            button.innerText = room.name;
+
+            coupleRoomsContainer.appendChild(button);
+        });
+
+        // Tạo các nút cho WALLS
+        walls.forEach(wall => {
+            const button = document.createElement('button');
+            button.className = 'room';
+            button.type = 'button';
+            button.onclick = () => selectWall(wall, button);
+            button.innerText = wall.name;
+
+            wallsContainer.appendChild(button);
+        });
+
+        const selectedSingleRooms = new Set();
+        const selectedCoupleRooms = new Set();
+        const selectedWalls = new Set();
+
+        function selectSingleRoom(room, button) {
+            if (selectedSingleRooms.has(room.name)) {
+                selectedSingleRooms.delete(room.name);
+                button.classList.remove('selected'); // Xóa lớp 'selected'
+            } else {
+                selectedSingleRooms.add(room.name);
+                button.classList.add('selected'); // Thêm lớp 'selected'
+            }
+            updateSelectedSingleRooms();
+        }
+
+        function selectCoupleRoom(room, button) {
+            if (selectedCoupleRooms.has(room.name)) {
+                selectedCoupleRooms.delete(room.name);
+                button.classList.remove('selected'); // Xóa lớp 'selected'
+            } else {
+                selectedCoupleRooms.add(room.name);
+                button.classList.add('selected'); // Thêm lớp 'selected'
+            }
+            updateSelectedCoupleRooms();
+        }
+
+        function selectWall(wall, button) {
+            if (selectedWalls.has(wall.name)) {
+                selectedWalls.delete(wall.name);
+                button.classList.remove('selected'); // Xóa lớp 'selected'
+            } else {
+                selectedWalls.add(wall.name);
+                button.classList.add('selected'); // Thêm lớp 'selected'
+            }
+            updateSelectedWalls();
+        }
+
+        function updateSelectedSingleRooms() {
+            selectedSingleRoomsDiv.innerHTML = '';
+
+            selectedSingleRooms.forEach(roomName => {
+                const room = singleRooms.find(r => r.name === roomName);
+                const roomInfo = document.createElement('div');
+                roomInfo.innerText = `${room.name}, Price: ${room.price}, Max Participants: `;
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'participant-input';
+                input.min = 1;
+                input.max = room.maxParticipants;
+                input.value = room.maxParticipants;
+                input.onchange = () => updateRoomParticipants(room.name, input.value);
+
+                roomInfo.appendChild(input);
+                selectedSingleRoomsDiv.appendChild(roomInfo);
+            });
+        }
+
+        function updateSelectedCoupleRooms() {
+            selectedCoupleRoomsDiv.innerHTML = '';
+
+            selectedCoupleRooms.forEach(roomName => {
+                const room = coupleRooms.find(r => r.name === roomName);
+                const roomInfo = document.createElement('div');
+                roomInfo.innerText = `${room.name}, Price: ${room.price}, Max Participants: `;
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'participant-input';
+                input.min = 1;
+                input.max = room.maxParticipants;
+                input.value = room.maxParticipants;
+                input.onchange = () => updateRoomParticipants(room.name, input.value);
+
+                roomInfo.appendChild(input);
+                selectedCoupleRoomsDiv.appendChild(roomInfo);
+            });
+        }
+
+        function updateSelectedWalls() {
+            selectedWallsDiv.innerHTML = '';
+
+            selectedWalls.forEach(wallName => {
+                const wall = walls.find(w => w.name === wallName);
+                const wallInfo = document.createElement('div');
+                wallInfo.innerText = `${wall.name}, Price: ${wall.price}, Max Participants: `;
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.className = 'participant-input';
+                input.min = 1;
+                input.max = wall.maxParticipants;
+                input.value = wall.maxParticipants;
+                input.onchange = () => updateRoomParticipants(wall.name, input.value);
+
+                wallInfo.appendChild(input);
+                selectedWallsDiv.appendChild(wallInfo);
+            });
+        }
+
+        function updateRoomParticipants(roomName, value) {
+            console.log(`Updated participants for ${roomName}: ${value}`);
+        }
+    </script>
+
+    <!-- Paint type -->
+    <script>
+        // Chọn 1 trong 2 paint_type
+        const paintTypes = document.querySelectorAll('.paint-type');
+
+        paintTypes.forEach(paintType => {
+            paintType.addEventListener('click', function () {
+                // Kiểm tra nếu ô đã có lớp 'selected'
+                if (this.classList.contains('selected')) {
+                    // Nếu có, xóa lớp 'selected'
+                    this.classList.remove('selected');
+                } else {
+                    // Xóa lớp 'selected' khỏi tất cả các ô khác
+                    paintTypes.forEach(item => item.classList.remove('selected'));
+
+                    // Thêm lớp 'selected' cho ô được click
+                    this.classList.add('selected');
+                }
+            });
+        });
+
+
+        // Lấy tất cả các phần tử màu
+        const colorElements = document.querySelectorAll('#colors .color');
+
+        // Lấy tất cả các phần tử tường
+        const wallElements = document.querySelectorAll('#spray_paint .spray');
+        const roomElements = document.querySelectorAll('#water_color .water');
+
+        // Biến để theo dõi vị trí của tường hiện tại
+        let currentWallIndex = 0;
+        let currentRoomIndex = 0;
+
+        // Hàm thay đổi màu tường
+        function changeWallColor(color) {
+            if (currentWallIndex < wallElements.length) {
+                wallElements[currentWallIndex].style.backgroundColor = color;
+                currentWallIndex++; // Tăng chỉ số tường hiện tại sau mỗi lần thay đổi màu
+            }
+        }
+        function changeRoomColor(color) {
+            if (currentRoomIndex < roomElements.length) {
+                roomElements[currentRoomIndex].style.backgroundColor = color;
+                currentRoomIndex++; // Tăng chỉ số tường hiện tại sau mỗi lần thay đổi màu
+
+            }
+        }
+
+        // Gán sự kiện click cho mỗi màu
+        colorElements.forEach(function (colorElement) {
+            colorElement.addEventListener('click', function () {
+                const selectedColor = this.style.backgroundColor; // Lấy màu trực tiếp từ background của màu đã chọn
+                changeWallColor(selectedColor);
+            });
+        });
+        colorElements.forEach(function (colorElement) {
+            colorElement.addEventListener('click', function () {
+                const selectedColor = this.style.backgroundColor; // Lấy màu trực tiếp từ background của màu đã chọn
+                changeRoomColor(selectedColor);
+            });
+        });
+        // Hàm đặt lại màu của các phòng và tường
+        function resetColors(type) {
+            globalPaintType = type
+            // Đặt lại chỉ số tường và phòng về 0
+            currentWallIndex = 0;
+            currentRoomIndex = 0;
+
+            // Lặp qua tất cả các phòng và tường để đặt lại trạng thái ban đầu
+            wallElements.forEach(wall => {
+                wall.style.backgroundColor = ''; // Đặt lại màu nền
+                wall.textContent = 'None'; // Đặt lại tên
+                wall.style.color = 'black'; // Đặt lại màu chữ
+                wall.onclick = null; // Loại bỏ sự kiện onclick
+            });
+
+            roomElements.forEach(room => {
+                room.style.backgroundColor = ''; // Đặt lại màu nền
+                room.textContent = 'None'; // Đặt lại tên
+                room.style.color = 'black'; // Đặt lại màu chữ
+                room.onclick = null; // Loại bỏ sự kiện onclick
+            });
+        }
+
+        document.getElementById('waterColorBtn').addEventListener('click', function () {
+            document.getElementById('water_color').style.display = 'block';
+            document.getElementById('colors').style.display = 'block';
+            document.getElementById('spray_paint').style.display = 'none';
+            document.getElementById('room-selection1').style.display = 'block';
+            document.getElementById('sprayPaintBtn').style.display = 'block';
+        });
+
+        document.getElementById('sprayPaintBtn').addEventListener('click', function () {
+            document.getElementById('water_color').style.display = 'none';
+            document.getElementById('colors').style.display = 'block';
+            document.getElementById('spray_paint').style.display = 'block';
+            document.getElementById('room-selection1').style.display = 'block';
+            document.getElementById('waterColorBtn').style.display = 'block';
+        });
+
+        let colorSelected = false;
+        let selectedWall = null;
+        let selectedColor = null;
+
+
+
+        function changeColor(colorName, colorValue) {
+
+            globalColors.push(colorName)
+            const walls = document.querySelectorAll('#spray_paint .spray'); // Lấy tất cả các bức tường
+            const rooms = document.querySelectorAll('#water_color .water'); // Lấy tất cả các bức tường
+
+            for (let room of rooms) {
+                if (room.textContent === 'None') { // Nếu bức tường có chữ "None"
+                    room.style.backgroundColor = colorValue; // Đổi màu cho bức tường
+                    room.textContent = colorName; // Thay đổi tên bức tường thành tên màu
+
+                    // Kiểm tra màu nền và thay đổi màu chữ nếu cần
+                    if (colorValue === 'black') {
+                        room.style.color = 'white'; // Đổi màu chữ thành trắng nếu nền đen
+                    } else {
+                        room.style.color = 'black'; // Đổi màu chữ thành đen cho các màu khác
+                    }
+
+                    room.onclick = function () {
+                        // Xóa màu và khôi phục lại trạng thái ban đầu của ô này
+                        room.style.backgroundColor = '';
+                        room.textContent = 'None';
+                        room.style.color = 'black';
+                        currentRoomIndex--;
+                        let index = globalColors.findIndex(item => item == colorName)
+                        globalColors.splice(index, 1)
+                        room.onclick = null; // Loại bỏ sự kiện onclick hiện tại để tránh lặp lại
+                    };
+
+                    colorSelected = true; // Đánh dấu rằng màu đã được chọn
+                    break; // Thoát vòng lặp sau khi đã thay đổi một bức tường
+                }
+            }
+            for (let wall of walls) {
+                if (wall.textContent === 'None') { // Nếu bức tường có chữ "None"
+                    wall.style.backgroundColor = colorValue; // Đổi màu cho bức tường
+                    wall.textContent = colorName; // Thay đổi tên bức tường thành tên màu
+
+                    // Kiểm tra màu nền và thay đổi màu chữ nếu cần
+                    if (colorValue === 'black') {
+                        wall.style.color = 'white'; // Đổi màu chữ thành trắng nếu nền đen
+                    } else {
+                        wall.style.color = 'black'; // Đổi màu chữ thành đen cho các màu khác
+                    }
+
+                    wall.onclick = function () {
+                        // Xóa màu và khôi phục lại trạng thái ban đầu của ô này
+                        wall.style.backgroundColor = '';
+                        wall.textContent = 'None';
+                        wall.style.color = 'black';
+                        currentWallIndex--;
+                        let index = globalColors.findIndex(item => item == colorName)
+                        globalColors.splice(index, 1)
+                        wall.onclick = null; // Loại bỏ sự kiện onclick hiện tại để tránh lặp lại
+
+                        console.log('action global', globalPaintType)
+                        console.log('action global', globalColors)
+                    };
+
+                    colorSelected = true; // Đánh dấu rằng màu đã được chọn
+                    break; // Thoát vòng lặp sau khi đã thay đổi một bức tường
+                }
+            }
+        }
+
+        // Hàm này sẽ được gọi để xử lý sự kiện nhấp chuột trên các ô màu
+        function handleColorClick(colorName, colorValue) {
+            changeColor(colorName, colorValue);
+        }
+
+    </script>
+    <!-- sketch -->
+    <script>
+        // Lấy phần tử ảnh và input
+        const imageInput = document.getElementById("imageInput");
+        const sketchImage = document.getElementById("number4");
+        // Lắng nghe sự kiện khi người dùng chọn ảnh
+        imageInput.addEventListener("change", function (event) {
+            const file = event.target.files[0]; // Lấy tệp đã chọn
+
+            if (file) {
+                const reader = new FileReader(); // Sử dụng FileReader để đọc file
+
+                // Khi file được đọc hoàn tất, cập nhật src của ảnh
+                reader.onload = function (e) {
+                    sketchImage.src = e.target.result; // Hiển thị ảnh đã chọn
+                };
+                // Đọc file dưới dạng URL để hiển thị ảnh
+                reader.readAsDataURL(file);
+            }
+        });
+        function replaceImage(element) {
+            var imgSrc = element.querySelector('img').src;
+            document.getElementById('number4').src = imgSrc;
+            document.getElementById('number4').alt = '3';
+            console.log("okkok")
+        }
+
+        const ImagePage = [
+            {
+                image_1: '/Sketching/3ec5721f53664b968936d33e33068164.jpg',
+                image_2: '/Sketching/4a40bae8da73717e9825f9477a86739c.jpg',
+                image_3: '/Sketching/4ce30f1b28d93da7b0b228cc29979e43.jpg',
+                image_4: '/Sketching/4fb5f13cde02799cdf83e5601ae929ba.jpg',
+                image_5: '/Sketching/5a41691e2edf1d7ccddef6a7817528b7.jpg',
+                image_6: '/Sketching/5f294b4d1039ddb9bd6742a20fae6efe.jpg',
+                image_7: '/Sketching/6f4eaddfb45810ecfbbefab432d77fd8.jpg',
+                image_8: '/Sketching/7c3dcb38b4c82fc25961f2d73298da1d.jpg',
+                // image_9: '/Image/3.jpg',
+                // image_10: '/Image/3.jpg',
+                // image_11: '/Image/3.jpg',
+            },
+            {
+                image_1: '/Sketching/8ab457649ef42bf65b2b4e9c5389f116.jpg',
+                image_2: '/Sketching/8ba8cfb87c3fa07f0b1e870082d037df.jpg',
+                image_3: '/Sketching/10df8c39121395b8e5b83ceb4093bc4b.jpg',
+                image_4: '/Sketching/12b9bd9f7fc71b131f8efd28a587ff91.jpg',
+                image_5: '/Sketching/16c2420a24315d1c8bc274cdd62006ce.jpg',
+                image_6: '/Sketching/24fa5bc0e9156ce8c4219ab06a646c37.jpg',
+                image_7: '/Sketching/47e3fb45b21597917b4da6668306deab.jpg',
+                image_8: '/Sketching/47ef733d58794e103aa0987b588b9329.jpg',
+                // image_9: '/Sketching/.jpg',
+                // image_10: '/Sketching/.jpg',
+                // image_11: '/Sketching/.jpg',
+            },
+            {
+                image_1: '/Sketching/56c2fa84e8827d073a50b42c77d4d374.jpg',
+                image_2: '/Sketching/80f7bd4b6d69ea6d1cd455f1d5b7eaf7.jpg',
+                image_3: '/Sketching/94be331d476de07a1884c757738fd8fb.jpg',
+                image_4: '/Sketching/888cd3eb3e915758bf149454e26f39b7.jpg',
+                image_5: '/Sketching/65423fc712391fd364dad5833663823b.jpg',
+                image_6: '/Sketching/344926da2d62b15c1f6b1bdf0b978160.jpg',
+                image_7: '/Sketching/788370e4e4eb2b45caa1e55052f69af2.jpg',
+                image_8: '/Sketching/af9c89e4fbab4ec43ed239730d4e86e6.jpg',
+                // image_9: '/Sketching/.jpg',
+                // image_10: '/Sketching/.jpg',
+                // image_11: '/Sketching/.jpg',
+            },
+            {
+                image_1: '/Sketching/be17692799b84018085f3f7575dbb12f.jpg',
+                image_2: '/Sketching/cc7feefd41944fae3cc974e57deb51d3.jpg',
+                image_3: '/Sketching/ccca9783ca916c1db0cd88042b1f389c.jpg',
+                image_4: '/Sketching/cd2707c26028eaa91de3cbabb767562c.jpg',
+                image_5: '/Sketching/d8806c4376045f574b9844d7e5d8bc5f.jpg',
+                image_6: '/Sketching/d861952ab60ee8bc6855a89d79ffb936.jpg',
+                image_7: '/Sketching/f0d56230eee4725ad344e1d50cda92ca.jpg',
+                image_8: '/Sketching/Screenshot 2024-10-08 145120.jpg',
+                // image_9: '/Sketching/.jpg',
+                // image_10: '/Sketching/.jpg',
+                // image_11: '/Sketching/.jpg',
+            },
+        ];
+        function changePage1(page) {
+            // Kiểm tra và cập nhật nội dung hình ảnh nếu phần tử tồn tại
+            for (let i = 1; i <= 11; i++) {
+                const imageElement = document.querySelector(`.image_${i}`);
+                if (imageElement) { // Kiểm tra xem phần tử có tồn tại không
+                    imageElement.src = ImagePage[page - 1][`image_${i}`];
+                }
+            }
+
+            // Cập nhật trạng thái nút
+            const buttons = document.querySelectorAll('.pagination button');
+            buttons.forEach(button => button.classList.remove('active1'));
+            buttons[page - 1].classList.add('active1');
+        }
+
+    </script>
+    <!-- your ticket -->
+    <script>
+        function generateTicket() {
+            // Lấy dữ liệu từ các input
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const paintype = document.getElementsByClassName('paint-type').value;
+            const colors = document.getElementsByClassName('wall').value;
+            const imageElement = document.getElementById('number4');
+            const imageSrc = imageElement ? imageElement.src : '';
+    
+            // Biến để lưu trữ thông tin đã chọn
+            let ticketDetails = '';
+    
+            // Duyệt qua các phòng đơn đã chọn
+            selectedSingleRooms.forEach(roomName => {
+                const room = singleRooms.find(r => r.name === roomName);
+                if (room) {
+                    ticketDetails += `<div>Single Room: ${room.name}, Price: ${room.price}, Max Participants: ${room.maxParticipants}</div>`;
+                }
+            });
+    
+            // Duyệt qua các phòng đôi đã chọn
+            selectedCoupleRooms.forEach(roomName => {
+                const room = coupleRooms.find(r => r.name === roomName);
+                if (room) {
+                    ticketDetails += `<div>Couple Room: ${room.name}, Price: ${room.price}, Max Participants: ${room.maxParticipants}</div>`;
+                }
+            });
+    
+            // Duyệt qua các tường đã chọn
+            selectedWalls.forEach(wallName => {
+                const wall = walls.find(w => w.name === wallName);
+                if (wall) {
+                    ticketDetails += `<div>Wall: ${wall.name}, Price: ${wall.price}, Max Participants: ${wall.maxParticipants}</div>`;
+                }
+            });
+    
+            // Tổng hợp thông tin ticket và dữ liệu khác
+            const ticketInfo = `
+                <div class="ticket-row">
+                    <span class="label">DATE:</span> 
+                    <span class="value">${date}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="label">TIME:</span> 
+                    <span class="value">${time}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="label">PAINT TYPE:</span> 
+                    <span class="value">${globalPaintType}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="label">COLORS:</span> 
+                    <span class="value">${globalColors.join(', ')}</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="label">Selected Details:</span> 
+                    <span class="value">${ticketDetails}</span>
+                </div>
+            `;
+    
+            // Hiển thị thông tin vé và ảnh đã chọn
+            document.getElementById('ticketDetails').innerHTML = ticketInfo;
+            const imageDisplay = document.getElementById('imageDisplay');
+            if (imageDisplay) {
+                imageDisplay.innerHTML = `<img src="${imageSrc}" alt="Selected Image" style="max-width: 300px">`;
+            }
+        }
+    </script>
+    
+
+    <!-- step -->
+    <script>
+        var currentTab = 0; // Current tab is set to be the first tab (0)
+        showTab(currentTab); // Display the current tab
+
+        function showTab(n) {
+            // This function will display the specified tab of the form ...
+            var x = document.getElementsByClassName("tab");
+            x[n].style.display = "block";
+            if (n == 0) {
+                document.getElementById("prevBtn").style.display = "none";
+            } else {
+                document.getElementById("prevBtn").style.display = "inline";
+            }
+            if (n == (x.length - 1)) {
+                document.getElementById("nextBtn").innerHTML = "Deposit";
+            } else {
+                document.getElementById("nextBtn").innerHTML = "Next";
+            }
+            // ... and run a function that displays the correct step indicator:
+            fixStepIndicator(n)
+        }
+
+        function nextPrev(n) {
+            // This function will figure out which tab to display
+            var x = document.getElementsByClassName("tab");
+            // Exit the function if any field in the current tab is invalid:
+            if (n == 1 && !validateForm()) return false;
+            // Hide the current tab:
+            x[currentTab].style.display = "none";
+            // Increase or decrease the current tab by 1:
+            currentTab = currentTab + n;
+            console.log('n ne', currentTab)
+            // if you have reached the end of the form... :
+            if (currentTab >= x.length) {
+                //...the form gets submitted:
+                document.getElementById("regForm").submit();
+                window.location.href = "https://book.stripe.com/test_14kdSF8Tk5s49C8cMO";
+                return false;
+            }
+            // Otherwise, display the correct tab:  
+            if (currentTab === 4) generateTicket()
+            showTab(currentTab);
+        }
+
+        function validateForm() {
+            // This function deals with validation of the form fields
+            var x, y, i, valid = true;
+            x = document.getElementsByClassName("tab");
+            y = x[currentTab].getElementsByTagName("input");
+            // A loop that checks every input field in the current tab:
+            for (i = 0; i < y.length; i++) {
+                console.log('y[i]', y[i].id)
+                if (y[i].type == 'file') {
+                    continue
+                }
+                if (y[i].value == "") {
+                    // add an "invalid" class to the field:
+                    y[i].className += " invalid";
+                    // and set the current valid status to false:
+                    valid = false;
+                }
+            }
+            // If the valid status is true, mark the step as finished and valid:
+            if (valid) {
+                document.getElementsByClassName("step")[currentTab].className += " finish";
+            }
+            console.log(valid)
+            return valid; // return the valid status
+        }
+
+        function fixStepIndicator(n) {
+            // This function removes the "active" class of all steps...
+            var i, x = document.getElementsByClassName("step");
+            for (i = 0; i < x.length; i++) {
+                x[i].className = x[i].className.replace(" active", "");
+            }
+            //... and adds the "active" class to the current step:
+            x[n].className += " active";
+        }
+
+    </script>
+
+    <hr class="custom-hr-black">
+    <footer>
+        <div class="logo-footer">
+            <a href="/Home.html">
+                <img src="/Image/Logo.png" alt="Logo">
+            </a>
+            <p class="p1">Subscribe to our newsletter to receive exclusive content and offers right to your inbox.</p>
+            <div class="subscribe">
+                <input type="email" placeholder="Your Email" required="required">
+                <button>
+                    Subscribe
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <ul id="menu-1-71a8b61a" class="elementor-nav-menu sm-vertical">
+                <li>Contact us</li>
+                <li>Press</li>
+                <li>FAQs</li>
+                <li>Jobs</li>
+                <li>Shop</li>
+                <li>Terms and Conditions</li>
+            </ul>
+
+        </div>
+        <div>
+            <ul class="social-link">
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.facebook.com/dom.dreamsofmural"
+                        class="elementor-item">
+                        <i class="fab fa-facebook-f" style="padding-right: 5px;"></i> Facebook
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.instagram.com/domdreamsofmural/"
+                        class="elementor-item">
+                        <i class="fab fa-instagram" style="padding-right: 5px;"></i> Instagram
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.tiktok.com/@dreamofmural"
+                        class="elementor-item">
+                        <i class="fab fa-tiktok" style="padding-right: 5px;"></i> Tiktok
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+    </footer>
+    <div class="table-footer">
+        <div class="left">
+            <div class="working">
+                <h1>WORKING HOURS</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="open-daily">
+                <div class="left-daily">
+                    <h2>OPEN DAILY</h2>
+                    <h1>10AM</h1>
+                </div>
+                <div class="right-daily">
+                    <h2>CLOSE TIME</h2>
+                    <hr class="custom-hr">
+                    <h1>7PM</h1>
+                    <p>Sun. Mon. Tue. Wed. Thu.</p>
+                    <h1>8PM</h1>
+                    <p>Fri. Sat.</p>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="weather">
+                <h1>WEATHER</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="weather-table">
+                <iframe
+                    src="https://thoitiet.app/widget/embed/da-nang?style=1&day=7&td=%23003870&ntd=%23ff0000&mvb=%23959dad&mv=%23ff0000&mdk=%23dddddd&htd=true"
+                    id="widgeturl" width="100%" height="600px" scrolling="no" frameborder="0" allowtransparency="true"
+                    style="border:none;overflow:hidden; height: 500px;"></iframe><!-- End thoitiet.app widget -->
+                <!-- https://thoitiet.app/widget -->
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="custom-scroll contacts-page v-scroll" id="custom-scroll"> </div>
+    <div class="canvas-outer beneath" data-splash-bg-outer=""> <splash-bg class="splash-bg" style="opacity: 1;"><canvas
+                width="1381" height="858"></canvas></splash-bg> </div>
+    <div class="canvas-outer" id="three-js"><canvas width="1381" height="858"
+            style="width: 1381px; height: 858px;"></canvas></div>
+</body>
+<script src="script.js"></script>
+
+</html>

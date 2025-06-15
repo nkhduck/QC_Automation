@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="about.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://corewynwood.com/wp-content/themes/corewynwood_template/jsWW1.js" defer=""></script>
+
+
+
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="preloader-content">
+            <img src="/Image/Logo.jpg" alt="Logo" class="preloader-logo">
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            const preloader = document.querySelector('.preloader');
+            setTimeout(() => {
+                preloader.classList.add('slide-out');
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 500);
+        });
+    </script>
+    <header>
+        <div class="logo">
+            <a href="/Home.html">
+                <img src="/Image/Logo.jpg" alt="Logo">
+            </a>
+        </div>
+        <nav class="menu-content">
+            <a href="/Home.html">HOME <span class="icon"><i class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Booking.html">BOOKING <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Galleries.html">GALLERIES <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+            <a href="/Aboutus.html">ABOUT US <span class="icon"><i
+                        class="fa-sharp fa-light fa-greater-than"></i></span></a>
+        </nav>
+
+    </header>
+    <div class="about-header">
+        <h2>About Us</h2>
+    </div>
+    <section class="about-section">
+        <div class="about-text">
+            <h1>The Story</h1>
+            <p>DOM (Dreams of Mural) was born from an urgent need within the art-loving community. As people’s lives improved, their needs evolved, moving beyond basic necessities to include a desire for self-expression, community, and creative exploration. Recognizing this, DOM's founders, fueled by their passion for creativity, envisioned a place where anyone could freely express themselves through mural art.
+                They discovered that, while there was interest in a space for community art, there was no place in Da Nang that met these needs.
+                DOM is a welcoming creative space where people can paint on walls without environmental concerns, equipped with all necessary tools. It’s a place for professional artists, beginners, and anyone who loves art to connect, learn, and create lasting memories together. DOM aims to bring out the hidden artist in everyone, creating a vibrant community united by the love of mural painting.</p>
+            <button class="btn">Learn More</button>
+        </div>
+        <div class="about-image">
+            <img src="/Image/about_logo.jpg">
+        </div>
+    </section>
+    <hr class="custom-hr-black">
+    <!-- Phần Team Members -->
+    <!-- <footer class="footer-image"> -->
+        <div class="about-header">
+            <h2>Founders of DOM - Dreams Of Mural</h2>
+        </div>
+        <div class="footer-image">
+        </div>
+    <!-- <section class="team-section">
+        <div class="about-header">
+            <h2>Meet Our Team</h2>
+        </div>
+        <div class="team-cards">
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Lê Thị Thu Trinh</h4>
+                    <p>Head of Marketing</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Ngô Phương Trinh</h4>
+                    <p>CEO</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Trịnh Thị Trâm</h4>
+                    <p>President Company</p>
+                </div>
+            </div>
+            
+        </div>
+        <div class="team-cards">
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Huỳnh Nguyễn Khánh Hiền</h4>
+                    <p>Manager</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Lê Nữ Thuỳ Nhung</h4>
+                    <p>Receiptionist</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <img src="https://via.placeholder.com/150" alt="Member">
+                <div class="card">
+                    <h4>Nguyễn Thị Xuân Anh</h4>
+                    <p>Accountan</p>
+                </div>
+            </div>
+        </div>
+    </section> -->
+    <hr class="custom-hr-black">
+    <!-- Phần Google Maps và Form -->
+
+     <div class="about-header">
+        <h2>Our Location</h2>
+    </div>
+    <section class="contact-section">
+        <div class="section">
+            <div class="map-container">
+                <!-- <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7667.559490855625!2d108.21654537490431!3d16.076915384603712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x314218398cf6835d%3A0x8ce28933f8b4f0df!2zODAgTMOqIEzhu6NpLCBUaOG6oWNoIFRoYW5nLCBI4bqjaSBDaMOidSwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2sus!4v1731761637993!5m2!1svi!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" 
+                    allowfullscreen="" 
+                    loading="lazy" 
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe> -->
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3834.251627081986!2d108.2443731749037!3d16.052427084624583!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142177ae1744c79%3A0xc9b7136fdc278e26!2zNzkgVHLhuqduIELhuqFjaCDEkOG6sW5nLCBC4bqvYyBN4bu5IFBow7osIE5nxakgSMOgbmggU8ahbiwgxJDDoCBO4bq1bmcgNTUwMDAwLCBWaeG7h3QgTmFt!5e0!3m2!1svi!2sus!4v1732368010765!5m2!1svi!2sus" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+        </div>
+        <div class="form-container">
+            <form action="#" method="POST">
+                <input type="text" name="name" placeholder="Your Name" required>
+                <input type="email" name="email" placeholder="Your Email" required>
+                <input type="text" name="subject" placeholder="Subject" required>
+                <textarea name="message" placeholder="Message" required></textarea>
+                <button type="submit" class="btn">SUBMIT</button>
+            </form>
+        </div>
+    </section>
+    <hr class="custom-hr-black">
+    <!-- Phần thông tin -->
+    <section class="info-section">
+        <div class="info-box">
+            <i class="fas fa-map-marker-alt"></i>
+            <h3>Our Location</h3>
+            <p>140/15, Shandestone, Victorian Palace, United States</p>
+        </div>
+        <div class="info-box">
+            <i class="fas fa-phone-alt"></i>
+            <h3>Call Us</h3>
+            <p>Office: (+84) 935 491 435<br>Email: dreamsofmural2024@gmail.com</p>
+        </div>
+        <div class="info-box">
+            <i class="fas fa-share-alt"></i>
+            <h3>We are social</h3>
+            <p>
+                <i class="fab fa-facebook"></i>
+                <i class="fab fa-twitter"></i>
+                <i class="fab fa-instagram"></i>
+                <i class="fab fa-linkedin"></i>
+            </p>
+        </div>
+    </section>
+    <hr class="custom-hr-black">
+    <!-- Footer -->
+    <footer class="footer-section">
+
+    </footer>
+    <hr class="custom-hr-black">
+    <footer>
+        <div class="logo-footer">
+            <a href="/Home.html">
+                <img src="/Image/Logo.png" alt="Logo">
+            </a>
+            <p class="p1">Subscribe to our newsletter to receive exclusive content and offers right to your inbox.</p>
+            <div class="subscribe">
+                <input type="email" placeholder="Your Email" required="required">
+                <button>
+                    Subscribe
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <ul id="menu-1-71a8b61a" class="elementor-nav-menu sm-vertical">
+                <li>Contact us</li>
+                <li>Press</li>
+                <li>FAQs</li>
+                <li>Jobs</li>
+                <li>Shop</li>
+                <li>Terms and Conditions</li>
+            </ul>
+
+        </div>
+        <div>
+            <ul class="social-link">
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.facebook.com/dom.dreamsofmural"
+                        class="elementor-item">
+                        <i class="fab fa-facebook-f" style="padding-right: 5px;"></i> Facebook
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.instagram.com/domdreamsofmural/"
+                        class="elementor-item">
+                        <i class="fab fa-instagram" style="padding-right: 5px;"></i> Instagram
+                    </a>
+                </li>
+                <li>
+                    <a target="_blank" rel="noopener" href="https://www.tiktok.com/@dreamofmural"
+                        class="elementor-item">
+                        <i class="fab fa-tiktok" style="padding-right: 5px;"></i> Tiktok
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+
+    </footer>
+    <div class="table-footer">
+        <div class="left">
+            <div class="working">
+                <h1>WORKING HOURS</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="open-daily">
+                <div class="left-daily">
+                    <h2>OPEN DAILY</h2>
+                    <h1>10AM</h1>
+                </div>
+                <div class="right-daily">
+                    <h2>CLOSE TIME</h2>
+                    <hr class="custom-hr">
+                    <h1>7PM</h1>
+                    <p>Sun. Mon. Tue. Wed. Thu.</p>
+                    <h1>8PM</h1>
+                    <p>Fri. Sat.</p>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="weather">
+                <h1>WEATHER</h1>
+            </div>
+            <hr class="custom-hr">
+            <div class="weather-table">
+                <iframe
+                    src="https://thoitiet.app/widget/embed/da-nang?style=1&day=7&td=%23003870&ntd=%23ff0000&mvb=%23959dad&mv=%23ff0000&mdk=%23dddddd&htd=true"
+                    id="widgeturl" width="100%" height="600px" scrolling="no" frameborder="0" allowtransparency="true"
+                    style="border:none;overflow:hidden; height: 500px;"></iframe><!-- End thoitiet.app widget -->
+                <!-- https://thoitiet.app/widget -->
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="custom-scroll contacts-page v-scroll" id="custom-scroll"> </div>
+    <div class="canvas-outer beneath" data-splash-bg-outer=""> <splash-bg class="splash-bg" style="opacity: 1;"><canvas
+                width="1381" height="858"></canvas></splash-bg> </div>
+    <div class="canvas-outer" id="three-js"><canvas width="1381" height="858"
+            style="width: 1381px; height: 858px;"></canvas></div>
+</body>
+
+</html>
